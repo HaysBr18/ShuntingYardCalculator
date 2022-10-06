@@ -2,6 +2,7 @@ package com.example.calculatorapp;
 
 import java.util.EmptyStackException;
 import java.util.LinkedList;
+import java.util.Locale;
 import java.util.Queue;
 import java.util.Stack;
 
@@ -13,7 +14,23 @@ public class Evaluator {
      */
     public static double calculate(char[] expression) {
         Queue<String> output = shunt(expression);
+
+
         return evalPfe(output);
+    }
+
+    public static int getPrecedence(String operator){
+
+        if (operator == "*" || operator == "/"){
+            return 1;
+        }
+
+        else if (operator == "+" || operator == "-"){
+            return 2;
+        }
+
+
+         return -1;
     }
 
     /**
@@ -203,7 +220,7 @@ public class Evaluator {
             if (expression[i] == '+') {
                 if (!operators.isEmpty()) {
                     String o = operators.peek();
-                    while (o.equals("+") || o.equals("-") || o.equals("*") || o.equals("/") || o.equals("^")) {
+                    while (getPrecedence(o) == 1) {
                         output.add(operators.pop());
                         if (operators.isEmpty()) break;
                         o = operators.peek();
@@ -223,7 +240,7 @@ public class Evaluator {
                 } else { // Handle subtraction.
                     if (!operators.isEmpty()) {
                         String o = operators.peek();
-                        while (o.equals("+") || o.equals("-") || o.equals("*") || o.equals("/") || o.equals("^")) {
+                        while (getPrecedence(o) == 1) {
                             output.add(operators.pop());
                             if (operators.isEmpty()) break;
                             o = operators.peek();
@@ -238,7 +255,7 @@ public class Evaluator {
             if (expression[i] == '*') {
                 if (!operators.isEmpty()) {
                     String o = operators.peek();
-                    while (o.equals("*") || o.equals("/") || o.equals("^")) {
+                    while (getPrecedence(o) == 2) {
                         output.add(operators.pop());
                         if (operators.isEmpty()) break;
                         o = operators.peek();
@@ -268,18 +285,13 @@ public class Evaluator {
                 continue;
             }
 
-            // Functions //
+            // Handle trigonometric and other math functions.
+            if(Character.isLetter(expression[i])){
+                String function = "";
 
-            // If char is a letter, get three-char function name and check if valid.
-            if (Character.isLetter(expression[i])) {
-                // Throw error if there is not enough room for a function name.
-                if (expression.length - i < 3) {
-                    throw new IllegalArgumentException("Invalid Input - Incorrect function name at end of expression."
-                            + " Valid functions are sin(), cos(), tan(), cot(), log(), and ln().");
-                }
+                function = function.copyValueOf(expression,i, 3);
 
-                String token = "" + expression[i] + expression[i + 1] + expression[i + 2];
-                switch (token.toLowerCase()) {
+                switch (function.toLowerCase()){
                     case "sin":
                         operators.push("sin");
                         break;
@@ -297,18 +309,21 @@ public class Evaluator {
                         break;
                     case "ln(":
                         operators.push("ln");
-                        i--; // ln is shorter than the rest, so offset i.
-                        break;
                     default:
-                        throw new IllegalArgumentException("Invalid Input - Incorrect function name."
+                        throw new IllegalArgumentException("Invalid Input - Incorrect function name at end of expression."
                                 + " Valid functions are sin(), cos(), tan(), cot(), log(), and ln().");
                 }
-                i += 2; // Move i to after the function name.
-                continue;
+
+                //Increment following the function name.
+                i+=2;
+
+                if(Character.isLetter(expression[i+1])){
+
+                    throw new IllegalArgumentException("Invalid Input - Incorrect function name at end of expression."
+                            + " Valid functions are sin(), cos(), tan(), cot(), log(), and ln().");
+                }
             }
 
-            // If character is still not handled, is illegal.
-            throw new IllegalArgumentException("Invalid Input - Incorrect character in expression.");
         }
 
         // Move all remaining operators to output, then return.

@@ -209,15 +209,17 @@ public class MainActivity extends AppCompatActivity {
     public void equalsBTN(View view){
         Evaluator exp = new Evaluator();
 
-        String expression1 = display.getText().toString();
+        char[] expression1 = display.getText().toString().toCharArray();
+        try {
+            double result = exp.calculate(expression1);
+            String StrResult = String.valueOf(result);
 
-        char[] expression2 = expression1.toCharArray();
+            display.setText(StrResult);
 
-       double result = exp.calculate(expression2);
+        }catch(Exception e){
+            display.setText(" Syntax Error, press: [C]");
+        }
 
-       String StrResult = String.valueOf(result);
-
-       display.setText(StrResult);
 
     }
     public void parenthesesBTN(View view){
