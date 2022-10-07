@@ -1,6 +1,7 @@
 package com.example.calculatorapp;
 
 import java.util.EmptyStackException;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Locale;
 import java.util.Queue;
@@ -9,6 +10,7 @@ import java.util.Stack;
 public class Evaluator {
     /**
      * Evaluate infix expression and return the result.
+     *
      * @param expression the infix expression to be evaluated.
      * @return a double containing the final result.
      */
@@ -19,22 +21,26 @@ public class Evaluator {
         return evalPfe(output);
     }
 
-    public static int getPrecedence(String operator){
+    // Operator having higher precedence
+    // value will be returned
+    static int getPrecedence(String ch) {
 
-        if (operator == "*" || operator == "/"){
+        if (ch.equals("+") || ch.equals("-")) {
             return 1;
-        }
-
-        else if (operator == "+" || operator == "-"){
+        } else if (ch.equals("*") || ch.equals("/")) {
             return 2;
+        } else if (ch.equals("^") || ch.equals("sin") || ch.equals("cos") || ch.equals("tan") || ch.equals("cot")
+                || ch.equals("log") || ch.equals("ln")) {
+            return 3;
+        } else {
+            return -1;
         }
-
-
-         return -1;
     }
+
 
     /**
      * Evaluate postfix expression and return the result.
+     *
      * @param output the postfix expression to be evaluated.
      * @return a double containing the final result.
      */
@@ -120,7 +126,6 @@ public class Evaluator {
             }
 
 
-
         }
 
         // Throw exception if there are too many numbers in stack.
@@ -129,12 +134,12 @@ public class Evaluator {
 
         return numbers.pop();
 
-        }
-
+    }
 
 
     /**
      * Convert infix expression to postfix expression.
+     *
      * @param expression the infix expression to be converted.
      * @return a Queue of Strings representing each token of the postfix expression.
      */
@@ -142,17 +147,35 @@ public class Evaluator {
         // Parse expression with (modified) Shunting-Yard algorithm by Edsger Dijkstra.
         Stack<String> operators = new Stack<>();
         Queue<String> output = new LinkedList<>();
+        HashSet<Character> ops = new HashSet<Character>();
+        ops.add('+');
+        ops.add('-');
+        ops.add('*');
+        ops.add('/');
+        ops.add('^');
+
+
+
+        for(int i = 0; i < expression.length; i++){
+            if(expression[i] == '{'){
+                expression[i] = '(';
+            }
+
+            if (expression[i] == '}'){
+                expression[i] = ')';
+            }
+        }
 
         for (int i = 0; i < expression.length; i++) {
-            // Stop parsing at the equals sign.
-            if (expression[i] == '=') {
-                break;
-            }
+
+
+
 
             // Throw exception if ) is found before (.
             if (expression[i] == ')') {
                 throw new IllegalArgumentException("Invalid Input - ')' without matching '('");
             }
+
 
             // While char is '0'-'9' or '.', add to token, then push all to output.
             if (Character.isDigit(expression[i]) || expression[i] == '.') {
@@ -178,6 +201,7 @@ public class Evaluator {
                 i--;
                 continue;
             }
+
 
             if (expression[i] == '(') {
                 // Check for implicit multiplication before parentheses.
@@ -216,31 +240,16 @@ public class Evaluator {
                 continue;
             }
 
-            // Handle addition.
-            if (expression[i] == '+') {
-                if (!operators.isEmpty()) {
-                    String o = operators.peek();
-                    while (getPrecedence(o) == 1) {
-                        output.add(operators.pop());
-                        if (operators.isEmpty()) break;
-                        o = operators.peek();
-                    }
-                }
-                operators.push("+");
-                continue;
-            }
-
-            // Handle subtraction/unary negation.
+            // Handle unary negation.
             if (expression[i] == '-') {
                 // Check for unary negation, then treat it as multiplying by -1.
-                if (i == 0 || expression[i - 1] == '(' || expression[i - 1] == '+' || expression[i - 1] == '-'
-                        || expression[i - 1] == '*' || expression[i - 1] == '/' || expression[i - 1] == '^') {
+                if (i == 0 || expression[i - 1] == '-' || expression[i - 1] == '(') {
                     operators.push("*");
                     output.add("-1");
-                } else { // Handle subtraction.
+                }else { // Handle subtraction.
                     if (!operators.isEmpty()) {
                         String o = operators.peek();
-                        while (getPrecedence(o) == 1) {
+                        while (o.equals("+") || o.equals("-") || o.equals("*") || o.equals("/") || o.equals("^")) {
                             output.add(operators.pop());
                             if (operators.isEmpty()) break;
                             o = operators.peek();
@@ -251,84 +260,77 @@ public class Evaluator {
                 continue;
             }
 
-            // Handle multiplication.
-            if (expression[i] == '*') {
-                if (!operators.isEmpty()) {
-                    String o = operators.peek();
-                    while (getPrecedence(o) == 2) {
-                        output.add(operators.pop());
-                        if (operators.isEmpty()) break;
-                        o = operators.peek();
+
+
+                //All other arithmetic operations.
+                if (ops.contains(expression[i])) {
+                    if (!operators.isEmpty()) {
+                        String o = operators.peek();
+                        while (getPrecedence(o) >= getPrecedence(String.valueOf(expression[i]))) {
+                            output.add(operators.pop());
+                            if (operators.isEmpty()) break;
+                            o = operators.peek();
+
+                        }
                     }
+                    operators.push(String.valueOf(expression[i]));
+                    continue;
                 }
-                operators.push("*");
-                continue;
-            }
 
-            // Handle division.
-            if (expression[i] == '/') {
-                if (!operators.isEmpty()) {
-                    String o = operators.peek();
-                    while (o.equals("*") || o.equals("/") || o.equals("^")) {
-                        output.add(operators.pop());
-                        if (operators.isEmpty()) break;
-                        o = operators.peek();
+
+
+
+
+                // Handle trigonometric and other math functions.
+                if (Character.isLetter(expression[i])) {
+                    String function = "";
+
+                    function = function.copyValueOf(expression, i, 3);
+
+                    switch (function.toLowerCase()) {
+                        case "sin":
+                            operators.push("sin");
+                            break;
+                        case "cos":
+                            operators.push("cos");
+                            break;
+                        case "tan":
+                            operators.push("tan");
+                            break;
+                        case "cot":
+                            operators.push("cot");
+                            break;
+                        case "log":
+                            operators.push("log");
+                            break;
+                        case "ln(":
+                            operators.push("ln");
+                            i--;
+                        default:
+                            throw new IllegalArgumentException("Invalid Input - Incorrect function name at end of expression."
+                                    + " Valid functions are sin(), cos(), tan(), cot(), log(), and ln().");
                     }
-                }
-                operators.push("/");
-                continue;
-            }
 
-            // Handle exponents.
-            if (expression[i] == '^') {
-                operators.push("^");
-                continue;
-            }
+                    //Increment following the function name.
+                    i += 2;
 
-            // Handle trigonometric and other math functions.
-            if(Character.isLetter(expression[i])){
-                String function = "";
 
-                function = function.copyValueOf(expression,i, 3);
+                    if (Character.isLetter(expression[i + 1])) {
 
-                switch (function.toLowerCase()){
-                    case "sin":
-                        operators.push("sin");
-                        break;
-                    case "cos":
-                        operators.push("cos");
-                        break;
-                    case "tan":
-                        operators.push("tan");
-                        break;
-                    case "cot":
-                        operators.push("cot");
-                        break;
-                    case "log":
-                        operators.push("log");
-                        break;
-                    case "ln(":
-                        operators.push("ln");
-                    default:
                         throw new IllegalArgumentException("Invalid Input - Incorrect function name at end of expression."
                                 + " Valid functions are sin(), cos(), tan(), cot(), log(), and ln().");
+                    }
+
+                    String token = "";
+
                 }
 
-                //Increment following the function name.
-                i+=2;
-
-                if(Character.isLetter(expression[i+1])){
-
-                    throw new IllegalArgumentException("Invalid Input - Incorrect function name at end of expression."
-                            + " Valid functions are sin(), cos(), tan(), cot(), log(), and ln().");
-                }
             }
 
+            // Move all remaining operators to output, then return.
+            while (!operators.isEmpty()) output.add(operators.pop());
+
+                return output;
+            }
         }
 
-        // Move all remaining operators to output, then return.
-        while (!operators.isEmpty()) output.add(operators.pop());
-
-        return output;
-    }
-}

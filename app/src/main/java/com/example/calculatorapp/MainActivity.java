@@ -167,11 +167,6 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void curlyBracesBTN(View view){
-
-
-
-    }
     public void clearBTN(View view){
         display.setText("");
 
@@ -191,19 +186,33 @@ public class MainActivity extends AppCompatActivity {
         }
     }
     public void percentBTN(View view){
-        updateInput("%");
+
+        if(display.getText().length() != 0 && display.getSelectionStart() !=0){
+            updateInput("%");
+        }
     }
     public void divisionBTN(View view){
-        updateInput("/");
+        if(display.getText().length() != 0 && display.getSelectionStart() !=0){
+            updateInput("/");
+        }
+
     }
     public void multiplicationBTN(View view){
-        updateInput("*");
+
+        if(display.getText().length() != 0 && display.getSelectionStart() !=0) {
+            updateInput("*");
+        }
+
     }
     public void subtractionBTN(View view){
-        updateInput("-");
+        if(display.getText().length() != 0 && display.getSelectionStart() !=0) {
+            updateInput("-");
+        }
     }
     public void additionBTN(View view){
-        updateInput("+");
+        if(display.getText().length() != 0 && display.getSelectionStart() !=0) {
+            updateInput("+");
+        }
     }
 
     public void equalsBTN(View view){
@@ -274,6 +283,37 @@ public class MainActivity extends AppCompatActivity {
             display.setSelection(cursorPosition-1);
         }
 
+
+
+    }
+
+    public void curlyBracesBTN(View view){
+        //Grabs the cursor position
+        int cursorPosition = display.getSelectionStart();
+        int strLength = display.getText().toString().length();
+
+        int numOpenPars = 0;
+        int numClosedPars = 0;
+
+        for (int i = 0; i < cursorPosition; i++){
+
+            if(display.getText().toString().substring(i, i+1).equals("{")) {
+                numOpenPars++;
+            }
+            else if(display.getText().toString().substring(i,i+1).equals("}")) {
+                numClosedPars++;
+            }
+        }
+
+        if (numClosedPars == numOpenPars || display.getText().toString().substring(strLength-1, strLength).equals("{")){
+            updateInput("{");
+        }
+
+        else if (numClosedPars < numOpenPars && !display.getText().toString().substring(strLength-1, strLength).equals("}")){
+            updateInput("}");
+        }
+
+        display.setSelection(cursorPosition + 1);
 
 
     }
