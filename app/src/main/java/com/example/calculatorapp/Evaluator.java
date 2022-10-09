@@ -1,3 +1,8 @@
+//Bryant R. Hays
+//10/09/2022
+//CS 480 Lab 2.
+
+//Evaluation/Shunting Yard algorithm is a modified version of https://github.com/KylerMosich/Calculator/blob/master/src/Evaluator.java
 package com.example.calculatorapp;
 
 import java.util.EmptyStackException;
@@ -16,13 +21,10 @@ public class Evaluator {
      */
     public static double calculate(char[] expression) {
         Queue<String> output = shunt(expression);
-
-
         return evalPfe(output);
     }
 
-    // Operator having higher precedence
-    // value will be returned
+    // Operator having higher precedence value will be returned.
     static int getPrecedence(String ch) {
 
         if (ch.equals("+") || ch.equals("-")) {
@@ -90,7 +92,7 @@ public class Evaluator {
                         if (b == 0)
                             throw new
                                     UnsupportedOperationException(
-                                    "Cannot divide by zero");
+                                    "Error: Division by 0. Press [C]");
                         numbers.push(a / b);
                         break;
 
@@ -148,9 +150,12 @@ public class Evaluator {
      * @return a Queue of Strings representing each token of the postfix expression.
      */
     private static Queue<String> shunt(char[] expression) {
-        // Parse expression with (modified) Shunting-Yard algorithm by Edsger Dijkstra.
+
+        // Parse expression with (modified) Shunting-Yard algorithm.
         Stack<String> operators = new Stack<>();
         Queue<String> output = new LinkedList<>();
+
+        //Set of valid operators.
         HashSet<Character> ops = new HashSet<Character>();
         ops.add('+');
         ops.add('-');
@@ -159,7 +164,7 @@ public class Evaluator {
         ops.add('^');
 
 
-
+        //Checks the expression for curly braces and replaces each occurrence with a parenthesis.
         for(int i = 0; i < expression.length; i++){
             if(expression[i] == '{'){
                 expression[i] = '(';
@@ -177,7 +182,7 @@ public class Evaluator {
 
             // Throw exception if ) is found before (.
             if (expression[i] == ')') {
-                throw new IllegalArgumentException("Invalid Input - ')' without matching '('");
+                throw new IllegalArgumentException("Invalid Input - ')' without matching '(' press [C]");
             }
 
 
@@ -194,11 +199,11 @@ public class Evaluator {
 
                 // Throw error if last digit is decimal point.
                 if (expression[i - 1] == '.') {
-                    throw new IllegalArgumentException("Invalid Input - Number ends with '.'");
+                    throw new IllegalArgumentException("Invalid Input - Number ends with '.' press [C]");
                 }
                 // Throw error if token has multiple decimal points.
                 if (decCount > 1) {
-                    throw new IllegalArgumentException("Invalid Input - Number has more than one '.'");
+                    throw new IllegalArgumentException("Invalid Input - Number has more than one '.' press [C]");
                 }
 
                 output.add(token);
@@ -224,7 +229,7 @@ public class Evaluator {
                         else if (expression[i] == ')') parenCount--;
                     } catch (ArrayIndexOutOfBoundsException e) {
                         // Throw exception if whole expression is parsed without finding ).
-                        throw new IllegalArgumentException("Invalid Input - '(' without matching ')'");
+                        throw new IllegalArgumentException("Invalid Input - '(' without matching ')' press [C]");
                     }
 
                     // Stop iterating when all ( are matched with ).
@@ -250,7 +255,7 @@ public class Evaluator {
                 if (i == 0 || expression[i - 1] == '-' || expression[i - 1] == '(') {
                     operators.push("*");
                     output.add("-1");
-                }else { // Handle subtraction.
+                }else { // Handle subtraction like normal.
                     if (!operators.isEmpty()) {
                         String o = operators.peek();
                         while (getPrecedence(o) >= getPrecedence(String.valueOf(expression[i]))) {
@@ -266,18 +271,22 @@ public class Evaluator {
 
 
 
-                //All other arithmetic operations.
+                //Handle all other arithmetic operations.
                 if (ops.contains(expression[i])) {
-
+                    //If operators stack is not empty, check the precedence of the peek operator from the stack
+                    //..compared to the current operator.
                     if (!operators.isEmpty()) {
                         String o = operators.peek();
+                        //If the peek element has greater precedence of current element.
                         while (getPrecedence(o) >= getPrecedence(String.valueOf(expression[i]))) {
+                            //Pop the peek operator from the stack and add it to the output.
                             output.add(operators.pop());
                             if (operators.isEmpty()) break;
                             o = operators.peek();
 
                         }
                     }
+                    //Push the current operator to the top of the stack.
                     operators.push(String.valueOf(expression[i]));
                     continue;
                 }
@@ -312,8 +321,7 @@ public class Evaluator {
                             operators.push("ln");
                             i--;
                         default:
-                            throw new IllegalArgumentException("Invalid Input - Incorrect function name at end of expression."
-                                    + " Valid functions are sin(), cos(), tan(), cot(), log(), and ln().");
+                            throw new IllegalArgumentException("Incorrect function name at end of expression. press [C]");
                     }
 
                     //Increment following the function name.
@@ -322,8 +330,8 @@ public class Evaluator {
 
                     if (Character.isLetter(expression[i + 1])) {
 
-                        throw new IllegalArgumentException("Invalid Input - Incorrect function name at end of expression."
-                                + " Valid functions are sin(), cos(), tan(), cot(), log(), and ln().");
+                        throw new IllegalArgumentException("Incorrect function name at end of expression. press [C]");
+
                     }
 
                     String token = "";

@@ -226,7 +226,7 @@ public class MainActivity extends AppCompatActivity {
             display.setText(StrResult);
 
         }catch(Exception e){
-            display.setText(" Syntax Error, press: [C]");
+            display.setText(e.getMessage());
         }
 
 
@@ -317,16 +317,6 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
-
-
-
-
-
-
-
-
-
-
 
 
 }
