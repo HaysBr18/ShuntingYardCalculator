@@ -113,6 +113,10 @@ public class Evaluator {
                         numbers.push(Math.tan(numbers.pop()));
                         break;
 
+                    case "cot":
+                        numbers.push(1.0/Math.tan(numbers.pop()));
+                        break;
+
                     case "log":
                         numbers.push(Math.log10(numbers.pop()));
                         break;
@@ -249,7 +253,7 @@ public class Evaluator {
                 }else { // Handle subtraction.
                     if (!operators.isEmpty()) {
                         String o = operators.peek();
-                        while (o.equals("+") || o.equals("-") || o.equals("*") || o.equals("/") || o.equals("^")) {
+                        while (getPrecedence(o) >= getPrecedence(String.valueOf(expression[i]))) {
                             output.add(operators.pop());
                             if (operators.isEmpty()) break;
                             o = operators.peek();
@@ -264,6 +268,7 @@ public class Evaluator {
 
                 //All other arithmetic operations.
                 if (ops.contains(expression[i])) {
+
                     if (!operators.isEmpty()) {
                         String o = operators.peek();
                         while (getPrecedence(o) >= getPrecedence(String.valueOf(expression[i]))) {
