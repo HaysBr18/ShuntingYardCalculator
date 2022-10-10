@@ -172,18 +172,9 @@ public class MainActivity extends AppCompatActivity {
 
     }
     public void plusMinusBTN(View view){
-        //Grabs the cursor position
-        int cursorPosition = display.getSelectionStart();
 
-        String textToEdit = display.getText().toString();
+        updateInput("-");
 
-        int strLength = display.getText().length();
-
-
-        if(strLength !=0) {
-            display.setText(new StringBuilder().append("-").append(textToEdit).toString());
-            display.setSelection(cursorPosition + 1);
-        }
     }
     public void percentBTN(View view){
 
@@ -224,6 +215,7 @@ public class MainActivity extends AppCompatActivity {
             String StrResult = String.valueOf(result);
 
             display.setText(StrResult);
+            display.setSelection(StrResult.length());
 
         }catch(Exception e){
             display.setText(e.getMessage());
@@ -231,7 +223,10 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
-    public void parenthesesBTN(View view){
+    public void openParenthesesBTN(View view){
+
+        updateInput("(");
+        /*
         //Grabs the cursor position
         int cursorPosition = display.getSelectionStart();
         int strLength = display.getText().toString().length();
@@ -258,7 +253,12 @@ public class MainActivity extends AppCompatActivity {
         }
 
         display.setSelection(cursorPosition + 1);
+         */
 
+    }
+
+    public void closedParenthesesBTN(View view){
+        updateInput(")");
     }
     public void pointBTN(View view){
         updateInput(".");

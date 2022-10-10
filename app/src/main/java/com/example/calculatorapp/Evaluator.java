@@ -252,7 +252,8 @@ public class Evaluator {
             // Handle unary negation.
             if (expression[i] == '-') {
                 // Check for unary negation, then treat it as multiplying by -1.
-                if (i == 0 || expression[i - 1] == '-' || expression[i - 1] == '(') {
+                if (i == 0 || expression[i - 1] == '(' || expression[i - 1] == '+' || expression[i - 1] == '-'
+                        || expression[i - 1] == '*' || expression[i - 1] == '/' || expression[i - 1] == '^') {
                     operators.push("*");
                     output.add("-1");
                 }else { // Handle subtraction like normal.
@@ -320,6 +321,7 @@ public class Evaluator {
                         case "ln(":
                             operators.push("ln");
                             i--;
+                            break;
                         default:
                             throw new IllegalArgumentException("Incorrect function name at end of expression. press [C]");
                     }

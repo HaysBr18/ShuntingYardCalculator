@@ -27,8 +27,8 @@
     <string name ="three">3</string>
     <string name ="addition">+</string>
     <string name ="zero">0</string>
-    <string name ="parentheses">( )</string>
-    <string name ="curlyBraces">{ }</string>
+    <string name ="openParentheses">(</string>
+    <string name ="closedParentheses">)</string>
     <string name ="point">.</string>
     <string name ="equals">=</string>
 
