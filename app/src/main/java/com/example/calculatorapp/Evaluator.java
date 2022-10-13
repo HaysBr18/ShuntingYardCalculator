@@ -24,7 +24,7 @@ public class Evaluator {
         return evalPfe(output);
     }
 
-    // Operator having higher precedence value will be returned.
+    // Evaluates the precedence of the current evaluator.
     static int getPrecedence(String ch) {
 
         if (ch.equals("+") || ch.equals("-")) {
@@ -137,6 +137,7 @@ public class Evaluator {
         // Throw exception if there are too many numbers in stack.
         if (numbers.size() > 1)
             throw new IllegalArgumentException("Invalid Input - Operand without operator.");
+
 
         return numbers.pop();
 

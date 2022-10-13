@@ -1,3 +1,8 @@
+//Bryant R. Hays
+//10/09/2022
+//CS 480 Lab 2.
+//For help building this interface, I followed along with this tutorial: https://www.youtube.com/watch?v=B5b-7uDtUp4&ab_channel=PracticalCoding
+// and added my own features to it.
 package com.example.calculatorapp;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -178,9 +183,7 @@ public class MainActivity extends AppCompatActivity {
     }
     public void percentBTN(View view){
 
-        if(display.getText().length() != 0 && display.getSelectionStart() !=0){
-            updateInput("%");
-        }
+
     }
     public void divisionBTN(View view){
         if(display.getText().length() != 0 && display.getSelectionStart() !=0){
